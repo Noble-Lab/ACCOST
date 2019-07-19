@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>ACCOST manual</title></head><body>
+<h2>ACCOST Manual</h2>
+<h3>Usage</h3><span style="font-weight: bold;">
+Single-sample mode:</span><br>
+<br>
+<pre>accost.py [options] &lt;bin size&gt; &lt;hi-c 1&gt; &lt;bias 1&gt; &lt;hi-c 2&gt; &lt;bias 2&gt;</pre><br><span style="font-weight: bold;">
+
+Replicate mode:</span><br>
+<br>
+<pre>accost.py [options] &lt;bin size&gt; &lt;filename input file&gt;</pre><br>
+
+<h3>Description</h3>
+
+ACCOST assigns statistical significance to differences in contact counts in Hi-C experiments. ACCOST uses a negative
+binomial to model the contact counts, and pools contacts at the same genomic distance to aid in estimating the mean
+and variance of the data.<br>
+<br>
+ACCOST can be run in two modes: without replicates, when only a single (biological) replicate is available, and with
+replicates, in cases where multiple biological replicates have been performed.<br>
+<br>
+
+<h3>Input format</h3>
+<span style="font-weight: bold;">Single-sample mode:</span><br>
+<br>
+
+&lt;hi-c 1&gt; and &lt;hi-c 2&gt; are Hi-C contact count files in
+tab-delimited format, with tab-delimited colums &lt;chr1&gt;
+&lt;mid1&gt; &lt;chr2&gt; &lt;mid2&gt; &lt;# reads&gt;<br>
+
+<br>
+
+E.g.:<br>
+
+<br>
+
+chr6&nbsp;&nbsp;&nbsp; 225000&nbsp;&nbsp;&nbsp; chr11&nbsp;&nbsp;&nbsp; 795000&nbsp;&nbsp;&nbsp; 1<br>
+
+chr5&nbsp;&nbsp;&nbsp; 425000&nbsp;&nbsp;&nbsp; chr8&nbsp;&nbsp;&nbsp; 1195000&nbsp;&nbsp;&nbsp; 1<br>
+
+chr5&nbsp;&nbsp;&nbsp; 425000&nbsp;&nbsp;&nbsp; chr8&nbsp;&nbsp;&nbsp; 1105000&nbsp;&nbsp;&nbsp; 1<br>
+
+chr5&nbsp;&nbsp;&nbsp; 425000&nbsp;&nbsp;&nbsp; chr8&nbsp;&nbsp;&nbsp; 1115000&nbsp;&nbsp;&nbsp; 1<br>
+
+chr5&nbsp;&nbsp;&nbsp; 425000&nbsp;&nbsp;&nbsp; chr8&nbsp;&nbsp;&nbsp; 1145000&nbsp;&nbsp;&nbsp; 2<br>
+
+chr5&nbsp;&nbsp;&nbsp; 425000&nbsp;&nbsp;&nbsp; chr8&nbsp;&nbsp;&nbsp; 1155000&nbsp;&nbsp;&nbsp; 3<br>
+
+chr2&nbsp;&nbsp;&nbsp; 685000&nbsp;&nbsp;&nbsp; chr14&nbsp;&nbsp;&nbsp; 2355000&nbsp;&nbsp;&nbsp; 1<br>
+
+<br>
+
+The data do not need to include zeros, and do not have to be sorted.<br>
+
+<br>
+
+&lt;bias 1&gt; and &lt;bias 2&gt; are normalization biases (e.g. from
+ICE normalization), and are a single column of floats such that:<br>
+
+<br>
+
+normalized_i,j = raw_i,j / (bias_i * bias_j)<br>
+
+<br>
+<span style="font-weight: bold;">Replicate mode:</span><br>
+<br>
+
+In replicate mode, filenames can be supplied as a file with the following format:<br>
+
+<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id 1&gt;<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id 1&gt;<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id 2&gt;<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id 2&gt;<br>
+
+<br>
+
+&lt;hi-c&gt; and &lt;bias&gt; are file names, with the files in the format described above, separated by whitespace.<br>
+
+<br>
+
+&lt;id 1&gt; and &lt;id 2&gt; can be anything (e.g. 1 and 2, or A and B, or WT and KO), but only two classes are supported.<br>
+<br>
+
+
+Initial processing of Hi-C data (mapping, filtering, binning, and normalization) is beyond the scope of this tool.<br>
+
+&nbsp;<br>
+
+&lt;bin size&gt; is an integer denoting the bin width, and is required.<br>
+<h3>Output format</h3>
+TODO<br>
+<h3>
+Options</h3>
+
+
+--distances &lt;file&gt;<br>
+&nbsp;&nbsp;&nbsp; pre-calculated distance file. If this is not
+specified, it will be calculated, but can be loaded to speed up
+calculations (default: None) <br>
+--output-prefix &lt;string&gt;<br>
+&nbsp;&nbsp;&nbsp; Prefix for output files<br>
+--map-thresh &lt;float&gt;<br>
+&nbsp;&nbsp;&nbsp; Mappability threshold (default: 0.25)<br>
+--min-dist &lt;int&gt;<br>
+&nbsp;&nbsp;&nbsp; Minimum distance to calculate P-values (default:???)<br>
+--max-dist &lt;int&gt;<br>
+&nbsp;&nbsp;&nbsp; Maximum distance to calculate P-values (default: None)<br>
+--min-percentile &lt;float&gt;<br>
+&nbsp;&nbsp;&nbsp; Percentile above which to calculate P-values (default: 0.8)<br>
+--chrom-sizes &lt;file&gt;<br>
+&nbsp;&nbsp;&nbsp; Chromosome sizes file (default: hg19 sizes)<br>
+--output-matrix &lt;boolean&gt;<br>
+&nbsp;&nbsp;&nbsp; Whether to output the full, dense matrix of P-values
+(rather than just those passing a threshold) (default: F)<br>
+--output-p-thresh &lt;float&gt;<br>
+--output-q-thresh &lt;float&gt;<br>
+&nbsp;&nbsp;&nbsp; Report loci for which the P-value or Q-value is
+below this threshold. One of these must be specified, but it can be 1.0
+to output everything.<br>
+<br><br>
+
+</body></html>

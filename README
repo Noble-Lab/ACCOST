@@ -1,7 +1,12 @@
-ACCOST assigns statistical significance to differences in contact counts in Hi-C experiments. ACCOST uses a negative binomial to model the contact counts, 
-and pools contacts at the same genomic distance to aid in estimating the mean and variance of the data.
+ACCOST assigns statistical significance to differences in contact
+counts in Hi-C experiments. ACCOST uses a negative binomial to model
+the contact counts, and pools contacts at the same genomic distance to
+aid in estimating the mean and variance of the data.
 
-For further information, contact Kate or William Noble <wnoble@uw.edu>
+For details on how to run the software, see manual.html.
+
+For further information, contact Kate Cook <kate.cook@gmail.com> or
+William Noble <wnoble@uw.edu>
 
 
 
