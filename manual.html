@@ -104,6 +104,41 @@ can be any string (e.g. 1 and 2, or A and B, or WT and KO), but only two classes
 <span style="font-family: monospace">&lt;bin size&gt;</span> is an integer denoting the bin width, and is required.<br>
 <h3>Output format</h3>
 
+<p>Running <span style="font-family: monospace">ACCOST.py</span> will output two files:
+<span style="font-family: monospace">&lt;output-prefix&gt;_ln_pvals.txt</span>
+(containing i,j indices and natural log of p-values) and
+<span style="font-family: monospace">stats.csv</span>
+(containing additional statistics useful for debugging).
+A more useful output file can be created by running<br>
+<br>
+<span style="font-family: monospace">annotate_pvals.py &lt;output-prefix&gt;_ln_pvals.txt binfile outputfile</span><br>
+<br>
+Input to <span style="font-family: monospace">annotate_pvals.py</span>
+is the natural log pval file, the bin file (see format description below), and an output file name. This will produce
+output of the form:
+</p>
+
+<div style="font-family: monospace">
+i   j   chr1   mid1   chr2   mid2   dist   ln_pval   log10_pval   pval<br>
+0   1   chr1   5000   chr1   15000   1   -13.708   -5.953   1.114e-06<br>
+0   2   chr1   5000   chr1   25000   2   -11.676   -5.071   8.497e-06<br>
+0   3   chr1   5000   chr1   35000   3   -2.251   -0.978   1.053e-01<br>
+0   9   chr1   5000   chr1   95000   9   -6.114   -2.655   2.212e-03<br>
+0   10   chr1   5000   chr1   105000   10   -4.342   -1.886   1.300e-02<br>
+</div>
+
+<p>
+The bin file required is columns 2-4 of the output file (without a header line), i.e.
+</p>
+
+<div style="font-family: monospace">
+chr1    5000    chr1    15000<br>
+chr1    5000    chr1    25000<br>
+chr1    5000    chr1    35000<br>
+chr1    5000    chr1    95000<br>
+chr1    5000    chr1    105000<br>
+</div>
+
 
 
 <h3>
