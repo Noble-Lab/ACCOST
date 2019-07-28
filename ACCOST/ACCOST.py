@@ -262,28 +262,8 @@ def process_row(i,fitted_matrix_A,fitted_matrix_B,A_stats,B_stats,q0,percentile_
         f_q0_A = A_estimator.predict(q0[j])
         f_q0_B = B_estimator.predict(q0[j])
         
-        #z_A = get_z(mats_A,q0[j],smooth_dist,i,j)
-        #z_B = get_z(mats_B,q0[j],smooth_dist,i,j)
-        #p_success_A = ( q0[j] * tau_A[j] ) / (q0[j] * tau_A[j] + ( f_q0_A - z_A )* phi_A[j])
-        #p_success_B = ( q0[j] * tau_B[j] ) / (q0[j] * tau_B[j] + ( f_q0_A - z_B )* phi_B[j])
-        #size_A = ( q0[j] * tau_A[j] ) / ( ( f_q0_A - z_A )* phi_A[j] )
-        #size_B = ( q0[j] * tau_B[j] ) / ( ( f_q0_B - z_B )* phi_B[j] )
-
-        # without z
-        #p_success_A = ( q0[j] * tau_A[j] ) / (q0[j] * tau_A[j] + f_q0_A * phi_A[j])
-        #p_success_B = ( q0[j] * tau_B[j] ) / (q0[j] * tau_B[j] + f_q0_A * phi_B[j])
-        #size_A = ( q0[j] * tau_A[j] ) / ( f_q0_A * phi_A[j])
-        #size_B = ( q0[j] * tau_B[j] ) / ( f_q0_B * phi_B[j])
-        
-        #p_success_A = q0[j]/f_q0_A
-        #p_success_B = q0[j]/f_q0_B
-        #size_A = q0[j]/(f_q0_A - q0[j])
-        #size_B = q0[j]/(f_q0_B - q0[j])
-        
         mean_A = tau_A[j] * q0[j]
         mean_B = tau_B[j] * q0[j]
-        #var_A = f_q0_A * phi_A[j]
-        #var_B = f_q0_A * phi_B[j]
         var_A = q0[j] * tau_A[j] + f_q0_A * phi_A[j]
         var_B = q0[j] * tau_B[j] + f_q0_A * phi_B[j] 
 
@@ -292,14 +272,6 @@ def process_row(i,fitted_matrix_A,fitted_matrix_B,A_stats,B_stats,q0,percentile_
         size_A = ( mean_A * mean_A ) / ( var_A - mean_A )
         size_B = ( mean_B * mean_B ) / ( var_B - mean_B )
 
-        # assuming var == f_q0
-        #p_success_A = ( tau_A[j] * q0[j] ) / (phi_A[j]*f_q0_A)
-        #p_success_B = ( tau_B[j] * q0[j] ) / (phi_B[j]*f_q0_B)
-        #size_A = ( tau_A[j] * q0[j] ) * ( tau_A[j] * q0[j] ) / (phi_A[j]*f_q0_A - tau_A[j] * q0[j])
-        #size_B = ( tau_B[j] * q0[j] ) * ( tau_B[j] * q0[j] ) / (phi_B[j]*f_q0_B - tau_B[j] * q0[j])
-        
-        
-        logging.debug("j: %d q0: %f fA: %f fB: %f" % (j,q0[j],f_q0_A,f_q0_B))
         
         # TODO this should acually check  no_dist_norm?
         #if fitted_matrix_A.size_factors is not None:
@@ -309,49 +281,10 @@ def process_row(i,fitted_matrix_A,fitted_matrix_B,A_stats,B_stats,q0,percentile_
         #    bias_A = fitted_matrix_A.biases[i] * fitted_matrix_A.biases[j]
         #    bias_B = fitted_matrix_B.biases[i] * fitted_matrix_B.biases[j]
         
-
-        # check the minimum values
-        #min_size = q0[j] / (q0[j]/MAX_VARIANCE - 1)
-        #min_p_success = q0[j] / MAX_VARIANCE
-        
         # calculate the size
         
-        # use the fitted variance
-        #size_A = max(min_size, (q0[j]*q0[j])/(bias_A * f_q0_A))
-        #size_B = max(min_size, (q0[j]*q0[j])/(bias_B * f_q0_B))
-        
-        # Use the (corrected) distance variance instead of the fitted variance
-        #size_A = max(min_size, q0[j] / (fitted_matrix_A.w[dist]/q0[j] - 1) )
-        #size_B = max(min_size, q0[j] / (fitted_matrix_B.w[dist]/q0[j] - 1) )
-
-        # use the count variance
-        #size_A = max(min_size, q0[j] / (count_var[i,j]/q0[j] - 1) )
-        #size_B = size_A
-        
-        #if size_A == min_size and size_B == min_size:
-        #    continue #TODO: should this be p=1?
-
-        # calculate the p_success
-        
-        # use the fitted variance
-        #p_success_A = q0[j]/ (q0[j] + bias_A * f_q0_A)
-        #p_success_B = q0[j]/ (q0[j] + bias_A * f_q0_B)
-        
-        # use the (corrected) distance variance instead of the fitted variance
-        #p_success_A = q0[j]/fitted_matrix_A.w[dist]
-        #p_success_B = q0[j]/fitted_matrix_B.w[dist]
-        
-        # use the count variance
-        #p_success_A = q0[j]/count_var[i,j]
-        #p_success_B = p_success_A
-
-        logging.debug("A: %f %f B: %f %f" % (size_A,p_success_A,size_B,p_success_B))
-   
-        #outfh2.write("%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % (i,j,q0[j],f_q0_A,f_q0_B,bias_A,bias_B,size_A,size_B,p_success_A,p_success_B))
-        #outfh2.write("%d,%d,%f,%f,%f,%f,%f,%f,%f\n" % (i,j,q0[j],f_q0_A,f_q0_B,size_A,size_B,p_success_A,p_success_B))
         outfh2.write("%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n" % (i,j,q0[j],f_q0_A,f_q0_B,size_A,size_B,p_success_A,p_success_B,tau_A[j],tau_B[j],phi_A[j],phi_B[j],mean_A,mean_B,var_A,var_B))
          
-        # now we have everything to do the pvalue calculation
         # joint probability
         log_p_counts_A = nbinom.logpmf(CA, n=size_A, p=p_success_A)
         log_p_counts_B = nbinom.logpmf(CB, n=size_B, p=p_success_B)
