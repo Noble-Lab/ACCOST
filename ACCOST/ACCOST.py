@@ -619,15 +619,6 @@ def precalculate_lengths(allBins_reversed, outfile, outfile_reversed, mappabilit
             fh.write("%d\t%d\t%d\n" % (l, i, j))
     fh.close()
 
-def parse_chrom_file(chrom_file):
-    chrom_size = []
-    chr_size_file = open(chrom_file, 'r')
-    for line in chr_size_file:
-        line = line[:-1]
-        pair = line.split('\t')
-        chrom_size.append(int(pair[1]))
-    chr_size_file.close()
-    return chrom_size
 
 
 def get_chrom_data(chrom_array, bin_size):
@@ -663,26 +654,25 @@ def set_up_argparser():
     parser = argparse.ArgumentParser()
     # required params
     parser.add_argument("binsize", type=int, help="the bin size of the input file")
-    parser.add_argument("binfile", help="list of immapable index")
+    parser.add_argument("binfile", help="bin and mappability file")
     parser.add_argument("idfile", help="input file of count and bias filenames")
     parser.add_argument("id_A", help="ID for class A")
     parser.add_argument("id_B", help="ID for class B")
     # optional params
-    parser.add_argument("-d", "--distances", default=None, help="pregenerated matrix with distance")
-    parser.add_argument("-dr", "--distance_reverse", default=None, help="reverse matrix with distance")
-    parser.add_argument("-o", "--output_prefix", default="differential_output", help="the prefix for output")
+    parser.add_argument("-d", "--distances", default=None, help="pregenerated matrix with distance, to speed up calculations")
+    parser.add_argument("-dr", "--distance_reverse", default=None, help="reverse matrix with distance, to speed up calcaulations")
+    parser.add_argument("-o", "--output_prefix", default="differential_output", help="the prefix for output. Can be a full path, e.g. /put/my/input/here_ will produce files with the prefix here_ in the directory input")
     # TODO implement min and max distance at which to run
-    parser.add_argument("-mind", "--min_dist", type=int, default=0, help="the lower threshold for length")
-    parser.add_argument("-maxd", "--max_dist", type=int, default=10000, help="the upper threshold for length")
+    parser.add_argument("-mind", "--min_dist", type=int, default=0, help="the lower threshold for distance (in bins, default 0)")
+    parser.add_argument("-maxd", "--max_dist", type=int, default=10000, help="the upper threshold for length (in bins, default 10000)")
     parser.add_argument("--filter_diagonal", type=bool, default=True, help="filter counts on the diagonal?" )
-    parser.add_argument("-m", "--map_thresh", type=float, default=0.25, help="the mappability threshold")
-    parser.add_argument("-p", "--min_percentile", type=int, default=100, help="the percentage threshold")
-    parser.add_argument("-ds", "--dist_smooth", type=int, default=10, help="the number of locus pairs to smooth over for calculating mean/variance")
-    parser.add_argument("-c", "--chromsize", help="chromosome size file")
+    parser.add_argument("-m", "--map_thresh", type=float, default=0.25, help="the mappability threshold below which to ignore bins (default 0.25)")
+    parser.add_argument("-p", "--min_percentile", type=int, default=80, help="the count percentile threshold, below which to ignore counts (default 80 (%%))")
+    parser.add_argument("-ds", "--dist_smooth", type=int, default=10, help="the number of locus pairs to smooth over for calculating mean/variance (default 10)")
     parser.add_argument("-om", "--output_matrix", help="Whether to output the full, dense matrix of P-values (rather than just those passing a threshold) (default: F)")
     parser.add_argument("--output_p_thresh")
     parser.add_argument("--output_q_thresh")
-    parser.add_argument("--no_dist_norm", action='store_true', help="Disable distance size factors")
+    parser.add_argument("--no_dist_norm", action='store_true', help="Disable distance size factors, for testing")
     return parser
     
 def debug_write(mat,outfile):
@@ -705,11 +695,6 @@ def main():
     parser = set_up_argparser()
     args = parser.parse_args()
     
-
-    #TODO: wtf?
-    #chrom_array = [249250621, 243199373, 198022430, 191154276, 180915260, 171115067, 159138663, 155270560, 146364022, 141213431,
-    #               135534747, 135006516, 133851895, 115169878, 107349540, 102531392, 90354753, 81195210, 78077248, 63025520,
-    #               59373566, 59128983, 51304566, 48129895]
 
     binfile = args.binfile
     binsize = args.binsize

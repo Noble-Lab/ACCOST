@@ -13,33 +13,49 @@ and variance of the data.<br>
 
 Initial processing of Hi-C data (mapping, filtering, binning, and normalization) is beyond the scope of this tool.<br>
 
-ACCOST can be run in two modes: without replicates, when only a single (biological) replicate is available, and with
-replicates, in cases where multiple biological replicates have been performed.<br>
-<br>
+<p><b>Prerequisites & credits</b></p>
+
+<p>ACCOST was written with Python 2.7 and R, and requires both. It also requires numpy and scipy, as well as some sklearn libraries.</p>
+
+<p>It makes use of the lowess_ code written by Alexandre Gramfort and Nelle Varoquaux, which is included under the terms of the BSD 3-clause license. See <span style="font-family: monospace">lowess_.py</span> for more details</p>
 
 <h3>Usage</h3>
 
+<pre>accost.py [options] &lt;bin size&gt; &lt;bin file&gt; &lt;filename input file&gt; &lt;ID A&gt; &lt;ID B&gt;</pre>
 
-<span style="font-weight: bold;">
-Single-sample mode:</span><br>
+<p><b>Required inputs</b></p>
 
+<p><span style="font-family: monospace">binsize</span> is an integer value corresponding to the number of bp in each bin</p>
+<p><span style="font-family: monospace">binfile</span> is a tab-delimted file with bin midpoints and mappability data, with the format:</p>
+<pre>
+&lt;chr ID&gt; &lt;mid&gt;   &lt;anythingElse&gt; &lt;mappabilityValue&gt; &lt;anythingElse&gt;+
+chr10     50000   NA              0.65               ...
+</pre>
+
+<p><span style="font-family: monospace">idfile</span> is a table of filenames and their assignments to celltypes/controls/etc which are themselves specified in <span style="font-family: monospace">ID A</span> and <span style="font-family: monospace">ID B</span>. The <span style="font-family: monospace">idfile</span> has the (tab-delimited) format:</p>
+
+<div style="font-family: monospace">
+&lt;hi-c&gt; &lt;bias&gt; &lt;id A&gt;<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id A&gt;<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id B&gt;<br>
+
+&lt;hi-c&gt; &lt;bias&gt; &lt;id B&gt;<br>
+</div>
 <br>
-<pre>accost.py [options] &lt;bin size&gt; &lt;hi-c 1&gt; &lt;bias 1&gt; &lt;hi-c 2&gt; &lt;bias 2&gt;</pre><br><span style="font-weight: bold;">
 
-Replicate mode:</span><br>
-<br>
-<pre>accost.py [options] &lt;bin size&gt; &lt;filename input file&gt;</pre><br>
+<span style="font-family: monospace">&lt;id A&gt;</span>
+and
+<span style="font-family: monospace">&lt;id B&gt;</span>
+can be any string (e.g. 1 and 2, or A and B, or WT and KO), but only two classes are supported.<br>
 
-<h3>Input format</h3>
+<p><b>Input format</b></p>
 
-<span style="font-family: monospace">&lt;hi-c 1&gt;</span> and
-<span style="font-family: monospace">&lt;hi-c 2&gt;</span> are <b>raw</b> Hi-C contact count files in
+<p>The inputs are <b>raw</b> Hi-C contact count files in
 tab-delimited format, with tab-delimited colums
-<span style="font-family: monospace">&lt;chr1&gt; &lt;mid1&gt; &lt;chr2&gt; &lt;mid2&gt; &lt;# reads&gt;</span>
+<span style="font-family: monospace">&lt;chr1&gt; &lt;mid1&gt; &lt;chr2&gt; &lt;mid2&gt; &lt;# reads&gt;</span><br>
 <br>
-
-<br>
-
 E.g.:<br>
 
 <br>
@@ -60,7 +76,7 @@ chr2&nbsp;&nbsp;&nbsp; 685000&nbsp;&nbsp;&nbsp; chr14&nbsp;&nbsp;&nbsp; 2355000&
 </div>
 <br>
 
-The data do not need to include zeros, and do not have to be sorted. Note that the data must be raw; non-integer counts will produce an error.<br>
+The data do not need to include zeros, and do not have to be sorted. Gzipped input (detected by providing a filename ending in gz) is supported. Note that the data must be raw; non-integer counts will produce an error.<br>
 
 <br>
 
@@ -72,36 +88,6 @@ ICE normalization), and are a single column of floats such that:<br>
 
 <span style="font-family: monospace">normalized_i,j = raw_i,j / (bias_i * bias_j)</span><br>
 
-<br>
-<span style="font-weight: bold;">Replicate mode:</span><br>
-<br>
-
-In replicate mode, filenames can be supplied as a file with the following format:<br>
-
-<br>
-<div style="font-family: monospace">
-&lt;hi-c&gt; &lt;bias&gt; &lt;id 1&gt;<br>
-
-&lt;hi-c&gt; &lt;bias&gt; &lt;id 1&gt;<br>
-
-&lt;hi-c&gt; &lt;bias&gt; &lt;id 2&gt;<br>
-
-&lt;hi-c&gt; &lt;bias&gt; &lt;id 2&gt;<br>
-</div>
-<br>
-
-<span style="font-family: monospace">&lt;hi-c&gt;</span> and
-<span style="font-family: monospace">&lt;bias&gt;</span> are file names, with the files in the format described above, separated by whitespace.<br>
-
-<br>
-
-<span style="font-family: monospace">&lt;id 1&gt;</span>
-and
-<span style="font-family: monospace">&lt;id 2&gt;</span>
-can be any string (e.g. 1 and 2, or A and B, or WT and KO), but only two classes are supported.<br>
-<br>
-
-<span style="font-family: monospace">&lt;bin size&gt;</span> is an integer denoting the bin width, and is required.<br>
 <h3>Output format</h3>
 
 <p>Running <span style="font-family: monospace">ACCOST.py</span> will output two files:
@@ -141,34 +127,61 @@ chr1    5000    chr1    105000<br>
 
 
 
-<h3>
-Options</h3>
+<b>Full argument list:</b><br>
+
+<pre>
+usage: ACCOST.py [-h] [-d DISTANCES] [-dr DISTANCE_REVERSE] [-o OUTPUT_PREFIX]
+                 [-mind MIN_DIST] [-maxd MAX_DIST]
+                 [--filter_diagonal FILTER_DIAGONAL] [-m MAP_THRESH]
+                 [-p MIN_PERCENTILE] [-ds DIST_SMOOTH] [-om OUTPUT_MATRIX]
+                 [--output_p_thresh OUTPUT_P_THRESH]
+                 [--output_q_thresh OUTPUT_Q_THRESH] [--no_dist_norm]
+                 binsize binfile idfile id_A id_B
+
+positional arguments:
+  binsize               the bin size of the input file
+  binfile               bin and mappability file
+  idfile                input file of count and bias filenames
+  id_A                  ID for class A
+  id_B                  ID for class B
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d DISTANCES, --distances DISTANCES
+                        pregenerated matrix with distance, to speed up
+                        calculations
+  -dr DISTANCE_REVERSE, --distance_reverse DISTANCE_REVERSE
+                        reverse matrix with distance, to speed up
+                        calcaulations
+  -o OUTPUT_PREFIX, --output_prefix OUTPUT_PREFIX
+                        the prefix for output. Can be a full path, e.g.
+                        /put/my/input/here_ will produce files with the prefix
+                        here_ in the directory input
+  -mind MIN_DIST, --min_dist MIN_DIST
+                        the lower threshold for distance (in bins, default 0)
+  -maxd MAX_DIST, --max_dist MAX_DIST
+                        the upper threshold for length (in bins, default
+                        10000)
+  --filter_diagonal FILTER_DIAGONAL
+                        filter counts on the diagonal?
+  -m MAP_THRESH, --map_thresh MAP_THRESH
+                        the mappability threshold below which to ignore bins
+                        (default 0.25)
+  -p MIN_PERCENTILE, --min_percentile MIN_PERCENTILE
+                        the count percentile threshold, below which to ignore
+                        counts (default 80 (%))
+  -ds DIST_SMOOTH, --dist_smooth DIST_SMOOTH
+                        the number of locus pairs to smooth over for
+                        calculating mean/variance (default 10)
+  -om OUTPUT_MATRIX, --output_matrix OUTPUT_MATRIX
+                        Whether to output the full, dense matrix of P-values
+                        (rather than just those passing a threshold) (default:
+                        F)
+  --output_p_thresh OUTPUT_P_THRESH
+  --output_q_thresh OUTPUT_Q_THRESH
+  --no_dist_norm        Disable distance size factors, for testing
+</pre>
 
 
-<span style="font-family: monospace">--distances &lt;file&gt;</span><br>
-&nbsp;&nbsp;&nbsp; pre-calculated distance file. If this is not
-specified, it will be calculated, but can be loaded to speed up
-calculations <span style="font-family: monospace">(see precalculate-lengths.py)</span> (default: None) <br>
-<span style="font-family: monospace">--output-prefix &lt;string&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Prefix for output files<br>
-<span style="font-family: monospace">--map-thresh &lt;float&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Mappability threshold (default: 0.25)<br>
-<span style="font-family: monospace">--min-dist &lt;int&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Minimum distance to calculate P-values (default:???)<br>
-<span style="font-family: monospace">--max-dist &lt;int&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Maximum distance to calculate P-values (default: None)<br>
-<span style="font-family: monospace">--min-percentile &lt;float&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Percentile above which to calculate P-values (default: 0.8)<br>
-<span style="font-family: monospace">--chrom-sizes &lt;file&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Chromosome sizes file (default: hg19 sizes)<br>
-<span style="font-family: monospace">--output-matrix &lt;boolean&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Whether to output the full, dense matrix of P-values
-(rather than just those passing a threshold) (default: F)<br>
-<span style="font-family: monospace">--output-p-thresh &lt;float&gt;</span><br>
-<span style="font-family: monospace">--output-q-thresh &lt;float&gt;</span><br>
-&nbsp;&nbsp;&nbsp; Report loci for which the P-value or Q-value is
-below this threshold. One of these must be specified, but it can be 1.0
-to output everything.<br>
-<br><br>
 
 </body></html>
