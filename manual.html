@@ -25,16 +25,22 @@ Note that ACCOST takes as input Hi-C that has already been mapped, filtered and 
 
 <p><b>Required inputs</b></p>
 
-<p><span style="font-family: monospace">binsize</span> is an integer value corresponding to the number of bases in each bin</p>
+<ul>
 
-<p><span style="font-family: monospace">binfile</span> is a tab-delimited file containing bin midpoints and mappability data, with the format:</p>
+  
+<li>
+<p><span style="font-family: monospace">bin size</span> is an integer value corresponding to the number of bases in each bin</p></li>
+
+<li>
+<p><span style="font-family: monospace">bin file</span> is a tab-delimited file containing bin midpoints and mappability data, with the format:</p></li>
 
 <pre>
 &lt;chr ID&gt; &lt;mid&gt;   &lt;anythingElse&gt; &lt;mappabilityValue&gt; &lt;anythingElse&gt;+
 chr10     50000   NA              0.65               ...
 </pre>
 
-<p><span style="font-family: monospace">idfile</span> is a table of filenames and their assignments to celltypes/controls/etc., which are themselves specified in the <span style="font-family: monospace">ID A</span> and <span style="font-family: monospace">ID B</span> columns. The <span style="font-family: monospace">idfile</span> has the following ttab-delimited format:</p>
+<li>
+  <p><span style="font-family: monospace">filename input file</span> is a table of filenames and their assignments to celltypes/controls/etc., which are themselves specified in the <span style="font-family: monospace">ID A</span> and <span style="font-family: monospace">ID B</span> columns. The <span style="font-family: monospace">idfile</span> has the following tab-delimited format:</p>
 
 <div style="font-family: monospace">
 &lt;hi-c&gt; &lt;bias&gt; &lt;id A&gt;<br>
@@ -46,11 +52,15 @@ chr10     50000   NA              0.65               ...
 &lt;hi-c&gt; &lt;bias&gt; &lt;id B&gt;<br>
 </div>
 <br>
+</li>
 
+<li>
 <span style="font-family: monospace">&lt;id A&gt;</span>
 and
 <span style="font-family: monospace">&lt;id B&gt;</span>
 can be any string (e.g. 1 and 2, or A and B, or WT and KO), but only two classes are supported.<br>
+</li>
+</ul>
 
 <p><b>Input format</b></p>
 
@@ -79,7 +89,7 @@ The data do not need to include zeros, and do not have to be sorted. Gzipped inp
 
 <span style="font-family: monospace">&lt;bias 1&gt;</span> and
 <span style="font-family: monospace">&lt;bias 2&gt;</span> are normalization biases (e.g. from
-ICE normalization), and are a single column of floats such that<br>
+ICE normalization), and are provided as a single column of floats such that<br>
 
 <br>
 

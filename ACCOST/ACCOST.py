@@ -29,9 +29,6 @@ import heapq
 import tempfile
 from itertools import izip_longest
 
-#TODO is this still used? delete
-MAX_VARIANCE = 10 ** 8
-
 #TODO clean up unused functions
 def get_null_mean(mats, q0):
     biasmats = np.array([np.outer(x.biases,x.biases) for x in mats])
@@ -646,6 +643,7 @@ def read_id_file(idfile,id_A,id_B):
             Bfiles.append((countfile,biasfile))
         else:
             raise Exception("ID %s in IDfile doesn't match ID_A (%s) or ID_B (%s)" % (lineid,id_A,id_B))
+    logging.info("Read %d pairs of files from %s." % (len(Afiles), idfile))
     return Afiles,Bfiles
         
 
@@ -689,9 +687,12 @@ def debug_write(mat,outfile):
 
 
 def main():
+
+    # Set up the logger, including printing messages to stderr.
     logging.basicConfig(filename='output.log',format='%(asctime)s %(levelname)s from %(filename)s %(funcName)s :: %(message)s', level=logging.INFO)
     #warnings.simplefilter("error")
-    
+    logging.getLogger().addHandler(logging.StreamHandler())
+
     parser = set_up_argparser()
     args = parser.parse_args()
     
@@ -721,16 +722,13 @@ def main():
     # output
     outprefix = args.output_prefix
     
-    #logging.info("setting tmpdir to current WD")
     tempfile.tempdir = os.getcwd()
     #tempfile.tempdir = '/scratch'
     #tempfile.tempdir = os.environ['TMPDIR']
     logging.info("temp directory currently set to: %s" % tempfile.tempdir)
      
     # set up bins
-    logging.info("Setting up bins")
     (allBins, allBins_reversed, badBins) = contact_counts.generate_bins(binfile, mappability_thresh)
-    
     
     # read input file setting up class A and class B
     Afiles,Bfiles = read_id_file(idfile,id_A,id_B)
@@ -761,8 +759,10 @@ def main():
         mats_B.append(matrixB)  
 
     mats = mats_A + mats_B
+    logging.info("Found %d matrix files." % len(mats))
    
     nBins = mats[0].nBins
+    logging.info("Total bins: %d" % nBins)
     #TODO: bag distances by number of bins at that distance, for the further out ones
     nDistances = nBins
     
@@ -772,12 +772,10 @@ def main():
     count_var = None    
 
     logging.info("Sorting data by genomic distance")
-    
-    
     for m in mats:
         tmp_length_indexed = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_length_indexed_")
         total_counts = contact_counts.length_index_contact_counts(m.infile,tmp_length_indexed,binsize,index_to_chrMid=allBins_reversed,chrMid_to_index=allBins)
-        logging.debug("total counts is %d" % total_counts)
+        logging.info("Total counts in %s is %d." % (m.infile, total_counts))
 
         tmp_sorted_by_length = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sorted_by_length_")
         contact_counts.sort_contactfile_by_length(tmp_length_indexed.name,tmp_sorted_by_length)
@@ -809,11 +807,8 @@ def main():
     #TODO: this should probably be moved somewhere      
     for m in mats:
         assert m.nBins == nBins
-    
      
-    
-    #logging.getLogger().setLevel(logging.DEBUG)
-    
+#    logging.getLogger().setLevel(logging.DEBUG)
     if no_dist_norm:
         logging.info("Skipping calculation of size factors")
         for mat in mats:

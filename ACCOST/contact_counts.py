@@ -55,6 +55,8 @@ def generate_bins(midsFile, lowMappThresh):
             badBins.add(i)
         i += 1
     fh.close()
+    logging.info("Found %d bins, including %d low mappability bins."
+                 % (i, len(badBins)))
     return (chrMid_to_index, index_to_chrMid, badBins)
 
 
@@ -367,6 +369,11 @@ def mynanpercentile(a, perc):
     return np.percentile(part[s], perc)
 
 
+def remove_zeroes_and_nans(my_matrix):
+    "Removing NaNs and zeroes from a matrix."
+    realMatrix = my_matrix[~np.isnan(my_matrix)]
+    return(realMatrix[np.nonzero(realMatrix)])
+
 def calculate_size_factors(mats,nBins,nDistances):
     """
     Calculate distance-specific size factors from the given filenames (of distance
@@ -382,7 +389,7 @@ def calculate_size_factors(mats,nBins,nDistances):
             for each replicate and each distance
     """
     nReplicates = len(mats)
-    logging.debug("calculating size factors: nBins: %d nDistances: %d nReplicates: %d" % (nBins, nDistances, nReplicates))
+    logging.info("calculating size factors: nBins=%d nDistances=%d nReplicates=%d" % (nBins, nDistances, nReplicates))
     filenames = [m.infile_sorted_by_length for m in mats]
     logging.debug(filenames)
     size_factors = np.ones((nReplicates,nDistances))
@@ -415,16 +422,16 @@ def calculate_size_factors(mats,nBins,nDistances):
                     done[d] = [False]*nReplicates
                 if all(done[current_distance]):
                     logging.debug("all done for d=%d" % current_distance)
-                    # now calculate the geometric mean across replicates
+                    # calculate the geometric mean across replicates
                     logging.debug("calculating gmean: %s" % str(counts.shape))
                     logging.debug(counts)
-                    gmean = scipy.stats.mstats.gmean(counts[counts>0&(~np.isnan(counts))],axis=None)
+                    gmean = scipy.stats.mstats.gmean(remove_zeroes_and_nans(counts), axis=None)
                     logging.debug("gmean is: %e" % gmean)
                     gmeansfh.write("%d\t%e\n" % (current_distance,gmean))
                     mean = np.nanmean(counts,axis=1)
                     for r in range(nReplicates):
                         meanfh.write("%d\t%d\t%e\n" % (r,current_distance,mean[r]))
-                    # now calculate the actual size factor for this replicate at this genomic distance
+                    # calculate the actual size factor for this replicate at this genomic distance
                     # by taking the median of the distribution of this replicate's counts divided by the
                     # geometric mean over replicates
                     for r in range(nReplicates):
@@ -479,8 +486,9 @@ def calculate_size_factors(mats,nBins,nDistances):
                 normalized = c / (biases[i]*biases[j])
                 counts[m,i] = normalized
     # doing the final one
-    gmean = scipy.stats.mstats.gmean(counts[counts>0&(~np.isnan(counts))],axis=None)
+    gmean = scipy.stats.mstats.gmean(remove_zeroes_and_nans(counts), axis=None)
     gmeansfh.write("%d\t%.3f\n" % (current_distance,gmean))
+    np.seterr(all='raise')  # From here on out, die if you hit a NaN.
     mean = np.nanmean(counts,axis=1)
     for r in range(nReplicates):
         meanfh.write("%d\t%d\t%f\n" % (r,current_distance,mean[r]))
@@ -496,12 +504,22 @@ def calculate_size_factors(mats,nBins,nDistances):
     for d in next_counts.keys():
         logging.debug("doing d=%d from next counts" % d)
         c = next_counts[d]
-        logging.debug(c[c>0&(~np.isnan(c))])
-        gmean = scipy.stats.mstats.gmean(c[c>0&(~np.isnan(c))],axis=None)
+        logging.debug(remove_zeroes_and_nans(c))
+        gmean = scipy.stats.mstats.gmean(remove_zeroes_and_nans(c), axis=None)
         gmeansfh.write("%d\t%.3f\n" % (d,gmean))
+
+        # N.B. This block is useless because it just goes to an unused output file.
         mean = np.nanmean(c,axis=1)
+        if (len(c[1]) == 0):
+            logging.info("doing d=%d from next counts" % d)
+            logging.info(remove_zeroes_and_nans(c))
+            logging.info("Cannot take the mean of zero values.")
+            gmeansfh.close()
+            meanfh.close()
+            sys.exit(1)
         for r in range(nReplicates):
              meanfh.write("%d\t%d\t%f\n" % (r,d,mean[r]))
+
         for r in range(nReplicates):
             rCounts = next_counts[d][r,:]
             #logging.debug("calculating size_factor: %d %s %s %s %.3f" % (r,str(next_counts[d].shape),str(next_counts[d][r,:]),str(rCounts),gmean))
