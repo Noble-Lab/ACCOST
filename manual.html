@@ -17,7 +17,6 @@ Note that ACCOST takes as input Hi-C that has already been mapped, filtered and 
 
 <p>ACCOST was written with Python 2.7 and R, and requires both. It also requires numpy and scipy, as well as some sklearn libraries.</p>
 
-<p>It makes use of the lowess_ code written by Alexandre Gramfort and Nelle Varoquaux, which is included under the terms of the BSD 3-clause license. See <span style="font-family: monospace">lowess_.py</span> for more details</p>
 
 <h3>Usage</h3>
 
@@ -43,13 +42,13 @@ chr10     50000   NA              0.65               ...
   <p><span style="font-family: monospace">filename input file</span> is a table of filenames and their assignments to celltypes/controls/etc., which are themselves specified in the <span style="font-family: monospace">ID A</span> and <span style="font-family: monospace">ID B</span> columns. The <span style="font-family: monospace">idfile</span> has the following tab-delimited format:</p>
 
 <div style="font-family: monospace">
-&lt;hi-c&gt; &lt;bias&gt; &lt;id A&gt;<br>
+&lt;id A&gt; &lt;hi-c&gt; &lt;bias&gt;<br>
 
-&lt;hi-c&gt; &lt;bias&gt; &lt;id A&gt;<br>
+&lt;id A&gt; &lt;hi-c&gt; &lt;bias&gt;<br>
 
-&lt;hi-c&gt; &lt;bias&gt; &lt;id B&gt;<br>
+&lt;id B&gt; &lt;hi-c&gt; &lt;bias&gt;<br>
 
-&lt;hi-c&gt; &lt;bias&gt; &lt;id B&gt;<br>
+&lt;id B&gt; &lt;hi-c&gt; &lt;bias&gt;<br>
 </div>
 <br>
 </li>
