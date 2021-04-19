@@ -82,7 +82,7 @@ chr2    685000    chr14    2355000  1
 </div>
 <br>
 
-The data do not need to include zeros, and do not have to be sorted. Gzipped input (detected by providing a filename ending in gz) is supported. Note that the data must be raw; non-integer counts will produce an error.<br>
+The data do not need to include zeros and do not have to be sorted. Gzipped input (detected by providing a filename ending in gz) is supported. Note that the data must be raw; non-integer counts will produce an error.<br>
 
 <br>
 
@@ -103,7 +103,7 @@ or could be provided as a single column of floats such that<br>
 <span style="font-family: monospace">normalized_i,j = raw_i,j / (bias_i * bias_j)</span><br>
 
 <br>
-In practice, one can easily obtain the single column of biases by running the ICE normalization package with output_bias=True. 
+In practice, one can easily obtain the single column of biases by running the <a href="http://members.cbio.mines-paristech.fr/~nvaroquaux/iced/index.html">ICE normalization package</a> with output_bias=True. 
 
 
 <h3>Output format</h3>
