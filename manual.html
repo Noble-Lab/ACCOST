@@ -88,11 +88,23 @@ The data do not need to include zeros, and do not have to be sorted. Gzipped inp
 
 <span style="font-family: monospace">&lt;bias 1&gt;</span> and
 <span style="font-family: monospace">&lt;bias 2&gt;</span> are normalization biases (e.g. from
-ICE normalization), and are provided as a single column of floats such that<br>
+ICE normalization). The files should either have three tab-delimited columns specifying the genomic coordinates of each bin and the corresponding bias, e.g.:<br>
+
+<pre>
+chr6    225000    0.87
+chr6    325000    0.92
+</pre>
+
+
+or could be provided as a single column of floats such that<br>
 
 <br>
 
 <span style="font-family: monospace">normalized_i,j = raw_i,j / (bias_i * bias_j)</span><br>
+
+<br>
+In practice, one can easily obtain the single column of biases by running the ICE normalization package with output_bias=True. 
+
 
 <h3>Output format</h3>
 
