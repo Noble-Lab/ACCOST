@@ -20,7 +20,7 @@ Note that ACCOST takes as input Hi-C that has already been mapped, filtered and 
 
 <h3>Usage</h3>
 
-<pre>accost.py [options] &lt;bin size&gt; &lt;bin file&gt; &lt;filename input file&gt; &lt;ID A&gt; &lt;ID B&gt;</pre>
+<pre>accost.py [options] &lt;bin size&gt; &lt;bin file&gt; &lt;filename input file&gt; &lt;ID A&gt; &lt;ID B&gt; &lt;output dir&gt;</pre>
 
 <p><b>Required inputs</b></p>
 
@@ -59,6 +59,11 @@ and
 <span style="font-family: monospace">&lt;id B&gt;</span>
 can be any string (e.g. 1 and 2, or A and B, or WT and KO), but only two classes are supported.<br>
 </li>
+
+<li>
+<p><span style="font-family: monospace">output dir</span> is the directory name where the output will be written. It will be created and shouldn't exist.</p></li>
+
+
 </ul>
 
 <p><b>Input format</b></p>
@@ -108,40 +113,25 @@ In practice, one can easily obtain the single column of biases by running the <a
 
 <h3>Output format</h3>
 
-<p>Running <span style="font-family: monospace">ACCOST.py</span> will produce two output files:
-<span style="font-family: monospace">&lt;output-prefix&gt;_ln_pvals.txt</span>
-(containing i,j indices and natural log of p-values) and
-<span style="font-family: monospace">stats.csv</span>
-(containing additional statistics useful for debugging).
-A more useful output file can be created by running<br>
-<br>
-<span style="font-family: monospace">annotate_pvals.py &lt;output-prefix&gt;_ln_pvals.txt binfile outputfile</span><br>
-<br>
-Input to <span style="font-family: monospace">annotate_pvals.py</span>
-is the natural log pval file, the bin file (see format description below), and an output file name. This will produce
-output of the form:
+<p>Running <span style="font-family: monospace">ACCOST.py</span> will produce three output files:
+<span style="font-family: monospace">&lt;chr_id&gt;_ln_pvals.txt</span>
+(containing i,j indices and natural log of p-values),
+<span style="font-family: monospace">&lt;chr_id&gt;_stats.csv</span>
+(containing additional statistics useful for debugging), and 
+<span style="font-family: monospace">&lt;chr_id&gt;_differential_ln_pvals_expanded.txt</span>
+(containing more user friendly expansion of the <span style="font-family: monospace">&lt;chr_id&gt;_ln_pvals.txt</span> file) in the form:
 </p>
 
 <pre>
 i   j   chr1   mid1   chr2   mid2   dist   ln_pval   log10_pval   pval
 0   1   chr1   5000   chr1   15000   1   -13.708   -5.953   1.114e-06
 0   2   chr1   5000   chr1   25000   2   -11.676   -5.071   8.497e-06
-0   3   chr1   5000   chr1   35000   3   -2.251   -0.978   1.053e-01
-0   9   chr1   5000   chr1   95000   9   -6.114   -2.655   2.212e-03
-0   10   chr1   5000   chr1   105000   10   -4.342   -1.886   1.300e-02
+0   3   chr1   5000   chr1   35000   3   -2.251    -0.978   1.053e-01
+0   9   chr1   5000   chr1   95000   9   -6.114    -2.655   2.212e-03
+0   10  chr1   5000   chr1   105000  10  -4.342    -1.886   1.300e-02
 </pre>
 
-<p>
-The bin file required is columns 2-4 of the output file (without a header line), i.e.
-</p>
 
-<pre>
-chr1    5000    chr1    15000
-chr1    5000    chr1    25000
-chr1    5000    chr1    35000
-chr1    5000    chr1    95000
-chr1    5000    chr1    105000
-</pre>
 
 
 <b>Full argument list:</b><br>
@@ -161,6 +151,7 @@ positional arguments:
   idfile                input file of count and bias filenames
   id_A                  ID for class A
   id_B                  ID for class B
+  outdir				name of the output directory
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -170,10 +161,6 @@ optional arguments:
   -dr DISTANCE_REVERSE, --distance_reverse DISTANCE_REVERSE
                         reverse matrix with distance, to speed up
                         calcaulations
-  -o OUTPUT_PREFIX, --output_prefix OUTPUT_PREFIX
-                        the prefix for output. Can be a full path, e.g.
-                        /put/my/input/here_ will produce files with the prefix
-                        here_ in the directory input
   -mind MIN_DIST, --min_dist MIN_DIST
                         the lower threshold for distance (in bins, default 0)
   -maxd MAX_DIST, --max_dist MAX_DIST
