@@ -16,7 +16,7 @@ from scipy import sparse
 from numpy.random import negative_binomial
 from scipy.stats import nbinom
 from scipy.stats import mstats
-from scipy.misc import logsumexp
+from scipy.special import logsumexp
 import contact_counts
 from NBfit import LogPolyEstimator
 import argparse
@@ -25,7 +25,7 @@ import heapq
 import tempfile
 import shutil
 import time
-from itertools import izip_longest
+from itertools import zip_longest
 
 
 def process_row(i,fitted_matrix_A,fitted_matrix_B,A_stats,B_stats,q0,percentile_thresh,dist_thresh_lower,dist_thresh_upper,outfh,outfh2,mats_A,mats_B,smooth_dist):
@@ -137,7 +137,7 @@ def pvals_filtered(fitted_matrix_A, fitted_matrix_B, matA_file, matB_file, q0_fi
 
     np.seterr(divide='ignore', invalid='ignore')
 
-    for aline,bline,qline in izip_longest(matA_reader,matB_reader,q0_reader):
+    for aline,bline,qline in zip_longest(matA_reader,matB_reader,q0_reader):
         if aline is not None:
             i = int(aline[0])
             if i > current_row:
@@ -368,16 +368,16 @@ def main():
     logging.info("Sorting data by genomic distance")
     for m in mats:
         # calculate the genomic distance between every two bins and the total number of counts in the matrix
-        tmp_length_indexed = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_length_indexed_")
+        tmp_length_indexed = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_length_indexed_", mode = "w")
         total_counts = contact_counts.length_index_contact_counts(m.infile,tmp_length_indexed,binsize,index_to_chrMid=allBins_reversed,chrMid_to_index=allBins)
         logging.info("Total counts in %s is %d." % (m.infile, total_counts))
 
         # sort the file by genomic distance
-        tmp_sorted_by_length = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sorted_by_length_")
+        tmp_sorted_by_length = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sorted_by_length_", mode ="w")
         contact_counts.sort_contactfile_by_length(tmp_length_indexed.name,tmp_sorted_by_length)
 
         # sort the file by counts
-        tmp_sorted_by_index = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sorted_by_index_")
+        tmp_sorted_by_index = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sorted_by_index_", mode = "w")
         contact_counts.sort_contactfile_by_index(tmp_length_indexed.name,tmp_sorted_by_index)
 
 
@@ -419,10 +419,10 @@ def main():
     
 
     # get total counts for A condition and B condition 
-    sumA_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sumA_")
+    sumA_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sumA_", mode = "w")
     contact_counts.sum_mats(mats_A,sumA_fh)
     
-    sumB_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sumB_")
+    sumB_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sumB_", mode = "w")
     contact_counts.sum_mats(mats_B,sumB_fh)
     
     
@@ -434,10 +434,10 @@ def main():
 
      
     logging.info("calculating common mean q0") 
-    q0_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_q0_")
+    q0_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_q0_", mode = "w")
     contact_counts.get_q0(mats,q0_fh,no_dist_norm)
     
-    sum_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sum_all_")
+    sum_fh = tempfile.NamedTemporaryFile(delete=False,prefix="tmp_sum_all_", mode = "w")
     contact_counts.sum_mats(mats,sum_fh)
     
 

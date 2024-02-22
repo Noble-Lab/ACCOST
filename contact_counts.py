@@ -4,7 +4,7 @@ import gzip
 import logging
 import subprocess
 import scipy
-from itertools import izip_longest
+from itertools import zip_longest
 from running_stats import running_average_simple,running_variance_simple,running_z_simple
 
 import os
@@ -189,7 +189,7 @@ def sum_mats(mats,outfh):
     done[current_row] = [False] * nReplicates
     next_counts[current_row] = np.zeros(nBins)
 
-    for lines in izip_longest(*readers, fillvalue=None):
+    for lines in zip_longest(*readers, fillvalue=None):
         for m,line in enumerate(lines):           
             if line is None:
                 continue
@@ -269,7 +269,7 @@ def get_q0(mats,q0_fh,no_dist_norm):
     current_row = 0
     done[current_row] = [False] * nReplicates
     next_counts[current_row] = np.zeros(nBins)
-    for lines in izip_longest(*readers, fillvalue=None):
+    for lines in zip_longest(*readers, fillvalue=None):
         for m,line in enumerate(lines):
             if line is None:
                 continue
@@ -385,10 +385,10 @@ def calculate_size_factors(mats,nBins,nDistances):
     done[0] = [False]*nReplicates
     
     # ready file handlers
-    meanfh = tempfile.NamedTemporaryFile(delete=False,prefix="means_by_distance_and_replicate_")
+    meanfh = tempfile.NamedTemporaryFile(delete=False,prefix="means_by_distance_and_replicate_", mode = "w")
     #meanfh = open('means_by_distance_and_replicate.tab','w')
     meanfh.write("replicate\tdist_nbins\tmean\n")
-    gmeansfh = tempfile.NamedTemporaryFile(delete=False,prefix="gmeans_by_distance_")
+    gmeansfh = tempfile.NamedTemporaryFile(delete=False,prefix="gmeans_by_distance_", mode = "w")
     #gmeansfh = open('gmeans_by_distance.tab','w')
     gmeansfh.write("dist_nbins\tgmean\n")
 
@@ -396,7 +396,7 @@ def calculate_size_factors(mats,nBins,nDistances):
     readers = open_files(filenames)
 
     # let's read each file concurretly, one line at a time
-    for lines in izip_longest(*readers, fillvalue=None):
+    for lines in zip_longest(*readers, fillvalue=None):
         # process file m with line line
         for m,line in enumerate(lines):
             biases = mats[m].biases
@@ -579,7 +579,7 @@ def calc_mean_var(readers,all_biases,all_size_factors,nBins,nDistances,badBins,s
     j_values = {}
     z = {}
 
-    for lines in izip_longest(*readers, fillvalue=None):
+    for lines in zip_longest(*readers, fillvalue=None):
         for m,line in enumerate(lines):
             if line is None:
                 continue
